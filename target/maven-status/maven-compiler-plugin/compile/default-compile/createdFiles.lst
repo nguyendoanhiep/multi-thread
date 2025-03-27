@@ -1,8 +1,0 @@
-com\example\demo\dto\SHA.class
-com\example\demo\response\DataResponse.class
-com\example\demo\response\ResultCode.class
-com\example\demo\service\Liveness$1.class
-com\example\demo\service\Liveness.class
-com\example\demo\response\ServiceResult.class
-com\example\demo\dto\LivenessRequest.class
-com\example\demo\Demo1Application.class
