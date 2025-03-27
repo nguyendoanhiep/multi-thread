@@ -1,0 +1,20 @@
+liveness-server:
+  enable: true
+  host: 10.30.21.123
+  port: 9082
+  secure: true
+  ssl:
+    enable: false
+    client-cert:
+      need: false
+
+image:
+  folder:
+    path: C:\Users\HiepND\Pictures\testImages\error\
+    path-fake-image: D:\MKG\test\fake\
+    path-error-image: D:\MKG\test\error\
+
+server:
+  port: 8081
+
+nThread : 10
