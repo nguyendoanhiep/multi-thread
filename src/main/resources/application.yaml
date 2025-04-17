@@ -9,8 +9,9 @@ liveness-server:
       need: false
 
 image:
+  is-save-image: true
   folder:
-    path: C:\Users\HiepND\Pictures\testImages\error\
+    path: C:\Users\HiepND\Pictures\testImages\
     path-fake-image: D:\MKG\test\fake\
     path-error-image: D:\MKG\test\error\
 

@@ -74,6 +74,9 @@ public class Liveness {
     @Value("${image.folder.path-error-image}")
     private String errorImagesFolder;
 
+    @Value("${image.is-save-image:false}")
+    private boolean isSaveImage;
+
     @Value("${nThread:1}")
     private Integer nThread;
     private SSLContext g_SSLContext = null;
@@ -95,6 +98,12 @@ public class Liveness {
         AtomicInteger totalImageScan = new AtomicInteger(0);
         AtomicInteger totalFakeImages = new AtomicInteger(0);
         AtomicInteger totalErrorImages = new AtomicInteger(0);
+        AtomicInteger rfScore095 = new AtomicInteger(0);
+        AtomicInteger rfScore096 = new AtomicInteger(0);
+        AtomicInteger rfScore097 = new AtomicInteger(0);
+        AtomicInteger rfScore098 = new AtomicInteger(0);
+        AtomicInteger rfScore099 = new AtomicInteger(0);
+        AtomicInteger rfScore100 = new AtomicInteger(0);
         ExecutorService executor = Executors.newFixedThreadPool(nThread);
         List<CompletableFuture<Void>> futures = new ArrayList<>();
 
@@ -128,15 +137,43 @@ public class Liveness {
                             log.info("response {}: ", any);
                             totalImageScan.incrementAndGet();
                             if (response.getSuccess().equalsIgnoreCase("true") && !response.getIs_rf()) {
-                                Path destinationPath = Paths.get(fakeImagesFolder, file.getName());
-                                Files.copy(file.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                                if(isSaveImage){
+                                    Path destinationPath = Paths.get(fakeImagesFolder, file.getName());
+                                    Files.copy(file.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                                }
                                 totalFakeImages.incrementAndGet();
-                                return;
                             }
                             if (response.getSuccess().equalsIgnoreCase("false") && knownErrors.contains(response.getErr_code())) {
-                                Path destinationPath = Paths.get(errorImagesFolder, file.getName());
-                                Files.copy(file.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                                if(isSaveImage) {
+                                    Path destinationPath = Paths.get(errorImagesFolder, file.getName());
+                                    Files.copy(file.toPath(), destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                                }
                                 totalErrorImages.incrementAndGet();
+                            }
+                            if(response.getRf_score() != null && response.getRf_score() > 0.94){
+                                if(response.getRf_score().equals(0.95)) {
+                                    rfScore095.incrementAndGet();
+                                    return;
+                                }
+                                if(response.getRf_score().equals(0.96)) {
+                                    rfScore096.incrementAndGet();
+                                    return;
+                                }
+                                if(response.getRf_score().equals(0.97)) {
+                                    rfScore097.incrementAndGet();
+                                    return;
+                                }
+                                if(response.getRf_score().equals(0.98)) {
+                                    rfScore098.incrementAndGet();
+                                    return;
+                                }
+                                if(response.getRf_score().equals(0.99)) {
+                                    rfScore099.incrementAndGet();
+                                    return;
+                                }
+                                if(response.getRf_score().equals(1.0)) {
+                                    rfScore100.incrementAndGet();
+                                }
                             }
                         }
                     } catch (IOException e) {
@@ -157,6 +194,12 @@ public class Liveness {
             log.info("Total images processed: {}", total + " (100.00%)");
             log.info("Total fake images: {} ({}%)", fake, String.format("%.2f", fakePercentage));
             log.info("Total error images: {} ({}%)", error, String.format("%.2f", errorPercentage));
+            log.info("Total images have rf_score is 0.95: {} ", rfScore095.get());
+            log.info("Total images have rf_score is 0.96: {} ", rfScore096.get());
+            log.info("Total images have rf_score is 0.97: {} ", rfScore097.get());
+            log.info("Total images have rf_score is 0.98: {} ", rfScore098.get());
+            log.info("Total images have rf_score is 0.99: {} ", rfScore099.get());
+            log.info("Total images have rf_score is 1.0: {} ", rfScore100.get());
 
             try {
                 String jarPath = new File(System.getProperty("java.class.path")).getAbsolutePath();
@@ -166,6 +209,12 @@ public class Liveness {
                     writer.write("Total images processed: " + total + " (100.00%)" + System.lineSeparator());
                     writer.write("Total fake images: " + fake + " (" + String.format("%.2f", fakePercentage) + "%)" + System.lineSeparator());
                     writer.write("Total error images: " + error + " (" + String.format("%.2f", errorPercentage) + "%)" + System.lineSeparator());
+                    writer.write("Total images have rf_score is 0.95 " + rfScore095.get() );
+                    writer.write("Total images have rf_score is 0.96 " + rfScore096.get() );
+                    writer.write("Total images have rf_score is 0.97 " + rfScore097.get() );
+                    writer.write("Total images have rf_score is 0.98 " + rfScore098.get() );
+                    writer.write("Total images have rf_score is 0.99 " + rfScore099.get() );
+                    writer.write("Total images have rf_score is 1.0 " + rfScore100.get() );
                 }
 
                 log.info("Log file written at: {}", resultFile.getAbsolutePath());
